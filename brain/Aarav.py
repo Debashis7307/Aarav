@@ -74,8 +74,8 @@ class Aarav:
         """Start real-time AI conversation."""
         self.is_running = True
         
-        print("🤖 Aarav: Hello! I'm Aarav, your AI assistant.")
-        speak_text("Hello! I'm Aarav, your AI assistant.")
+        print("🤖 Aarav: yo! I’m Aarav — creative mind, digital soul, curious & clever assistant to Debashis... or as I call him, Devb — my partner in code and chaos!")
+        speak_text("yo! I’m Aarav — creative mind, digital soul, curious & clever assistant to Debashis... or as I call him, Devb — my partner in code and chaos!")
         print("🎤 I can help you with questions, tasks, and conversations!")
         speak_text("I can help you with questions, tasks, and conversations!")
         print("🎤 Say 'stop it' or 'bye-bye' to end our conversation.")

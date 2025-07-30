@@ -1,0 +1,5 @@
+# Environment Configuration for Communication Module
+# Copy this content to .env file and add your actual API key
+
+# ElevenLabs API Key - Get from https://elevenlabs.io/
+ELEVENLABS_API_KEY=your_elevenlabs_api_key_here 
