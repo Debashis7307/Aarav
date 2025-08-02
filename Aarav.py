@@ -9,10 +9,12 @@ import os
 import random
 sys.path.append('Communication')
 sys.path.append('brain')
+sys.path.append('Automate/Web & Internet')
 
 from Communication.listen import SpeechToText
 from Communication.speak import speak_text
 from brain.gemini_brain import GeminiBrain
+from web_automation_integration import WebAutomationIntegration
 import time
 import threading
 
@@ -21,6 +23,7 @@ class Aarav:
         """Initialize Aarav AI Assistant."""
         self.listener = SpeechToText()
         self.brain = GeminiBrain()
+        self.web_automation = WebAutomationIntegration()
         self.is_running = False
         self.is_awake = False
         
@@ -46,7 +49,7 @@ class Aarav:
         
         # Wake-up commands
         self.wake_commands = [
-            "wake up aarav",
+            "wake up",
             "wake up aarav",
             "hey aarav",
             "aarav wake up",
@@ -65,6 +68,18 @@ class Aarav:
             "introduce yourself",
             "what's your name",
             "who is aarav"
+        ]
+        
+        # Web automation commands (keywords that trigger web automation)
+        self.web_commands = [
+            "open", "go to", "navigate to", "visit", "launch", "start",
+            "search", "find", "look for", "search for",
+            "play", "music", "video", "song", "watch", "listen",
+            "facebook", "instagram", "twitter", "linkedin", "reddit",
+            "gmail", "email", "outlook", "yahoo",
+            "weather", "maps", "youtube", "spotify", "netflix",
+            "screenshot", "screen shot", "capture", "snap", "photo", "picture", "save screen",
+            "close", "remove", "delete", "cross", "shut", "exit", "tab", "browser", "window"
         ]
         
         # Stop commands
@@ -101,6 +116,11 @@ class Aarav:
         """Check if the text contains an intro/identity command."""
         text_lower = text.lower().strip()
         return any(intro_cmd in text_lower for intro_cmd in self.intro_commands)
+    
+    def is_web_command(self, text: str) -> bool:
+        """Check if the text contains a web automation command."""
+        text_lower = text.lower().strip()
+        return any(web_cmd in text_lower for web_cmd in self.web_commands)
     
     def is_stop_command(self, text: str) -> bool:
         """Check if the text contains a stop command."""
@@ -147,7 +167,9 @@ class Aarav:
         while self.is_running:
             try:
                 # Step 1: You - Speech to Text
-
+                if self.is_awake:
+                    print("🎤 ", end="", flush=True)
+                
                 user_text = self.listener.listen_and_convert()
                 
                 if user_text:
@@ -175,6 +197,23 @@ class Aarav:
                         speak_text(intro_message)
                         continue
                     
+                    # Check if it's a web automation command
+                    if self.is_web_command(user_text):
+                        if self.is_awake:
+                            print("🌐 Aarav: Processing web command...", end="", flush=True)
+                            success, response = self.web_automation.process_voice_command(user_text)
+                            print(" Done!")
+                            
+                            if success:
+                                print(f"🤖 Aarav: {response}")
+                                speak_text(response)
+                            else:
+                                print(f"❌ Aarav: {response}")
+                                speak_text(response)
+                        else:
+                            print("💤 Aarav is sleeping... ")
+                        continue
+                    
                     # Check if it's a stop command
                     if self.is_stop_command(user_text):
                         if self.is_awake:
@@ -195,8 +234,6 @@ class Aarav:
                         
                         # Small delay to ensure speech completes
                         time.sleep(0.5)
-                    else:
-                        print("💤 Aarav is sleeping... ")
                 
                 else:
                     # Don't print anything when no speech detected
@@ -221,6 +258,7 @@ def main():
     print("🎧 You: Speech to Text")
     print("🧠 Aarav: Thinking (Generating)")
     print("🤖 Aarav: Speaks Response")
+    print("🌐 Web Automation: Open, Search, Play")
     print("=" * 40)
     
     # Start Aarav AI

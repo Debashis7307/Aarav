@@ -32,7 +32,7 @@ class ElevenLabsSpeaker:
         
         # Default voice ID (Rachel - a clear, friendly voice)
         # You can change this to any voice ID from ElevenLabs
-        self.voice_id = "jqcCZkN6Knx8BJ5TBdYR"  
+        self.voice_id = "jqcCZkN6Knx8BJ5TBdYR"
         # Available voices:
    
         # jhon-2ro171emrYO7IuOOs8rf, G6TsGA4LBTYQWAMgsYzl|
