@@ -9,8 +9,8 @@ Aarav/
 ├── aarav.py              # Main AI assistant (run this to start)
 ├── Communication/        # Voice communication modules
 │   ├── listen.py         # Speech-to-text functionality
-│   ├── speak.py          # Text-to-speech (ElevenLabs)
-│   ├── .env              # ElevenLabs API key
+│   ├── speak.py          # Text-to-speech (Murf)
+│   ├── .env              # Murf API key
 │   └── requirements.txt  # Communication dependencies
 ├── brain/               # AI brain modules
 │   ├── gemini_brain.py  # Gemini API integration
@@ -30,7 +30,7 @@ Aarav/
 2. **Set up API Keys:**
 
    - Copy `Communication/env_example.txt` to `Communication/.env`
-   - Add your ElevenLabs API key: `ELEVENLABS_API_KEY=your_key_here`
+   - Add your Murf API key: `MURF_API_KEY=your_key_here`
    - Copy `brain/env_example.txt` to `brain/.env`
    - Add your Gemini API key: `GEMINI_API_KEY=your_key_here`
 
@@ -46,7 +46,7 @@ Aarav/
 - **Intro Commands** - Ask "who are you" for personality introductions
 - **Wake-up During Conversation** - Say "Aarav" anytime for wake-up response
 - **Real-time Speech Recognition** - Listen to your voice continuously
-- **Advanced Text-to-Speech** - Human-like voice using ElevenLabs
+- **Advanced Text-to-Speech** - Human-like voice using Murf
 - **AI Brain** - Powered by Google Gemini API
 - **Word-by-Word Display** - See responses as they're spoken
 - **Voice Commands** - Say "stop it" or "bye-bye" to end conversation
@@ -111,7 +111,7 @@ When you ask "who are you", Aarav randomly selects one of these introductions:
 ## 🔧 Technical Details
 
 - **Speech Recognition**: Google Speech Recognition API
-- **Text-to-Speech**: ElevenLabs API (Professional voice synthesis)
+- **Text-to-Speech**: Murf API (Professional voice synthesis)
 - **AI Brain**: Google Gemini 2.0 Flash
 - **Audio Playback**: Pygame mixer
 - **Language**: English (optimized for clear speech)
@@ -120,21 +120,19 @@ When you ask "who are you", Aarav randomly selects one of these introductions:
 
 ## 🎨 Voice Options
 
-You can change the voice in `Communication/speak.py` by modifying the `voice_id`:
+You can change the voice in `Communication/speak.py` by modifying the `voice_id` and `style`:
 
 ```python
-self.voice_id = "jqcCZkN6Knx8BJ5TBdYR"  # Current voice
+self.voice_id = "en-US-ken"  # Current voice (Murf)
+self.style = "Conversational"  # Current style
 ```
 
-Available voices:
+**Current Configuration:**
+- **Voice**: `en-US-ken` (Male voice)
+- **Style**: `Conversational`
+- **Provider**: Murf AI
 
-- `jhon-2ro171emrYO7IuOOs8rf`
-- `sam-scOwDtmlUjD3prqpp97I`
-- `james-EkK5I93UQWFDigLMpZcX`
-- `david-v9LgF91V36LGgbLX3iHW`
-- `mask-UgBBYS2sOqTuMpoF3BR0`
-- `girl-jqcCZkN6Knx8BJ5TBdYR` (current)
-- And many more...
+Available Murf voices include various English voices with different styles and emotions.
 
 ## 🐛 Troubleshooting
 
