@@ -148,8 +148,47 @@ This guide shows all the voice commands you can use with Aarav to control web br
 
 - **Automatic naming**: Files are named with timestamp (e.g., `screenshot_20250108_213045.png`)
 - **File size info**: Aarav tells you the file size after saving
-- **Organized storage**: All screenshots saved in `screenshots` folder
+- **Organized storage**: All screenshots saved in `img/screenshots` folder
 - **High quality**: Full resolution screen capture
+
+## 🎨 Image Generation Commands
+
+### Basic Image Generation
+
+- **"Generate image of a sunset"** - Creates an AI-generated image of a sunset
+- **"Create image beautiful landscape"** - Generates a beautiful landscape image
+- **"Make image cute cat"** - Creates an image of a cute cat
+- **"Draw image futuristic city"** - Generates a futuristic city image
+- **"Paint image mountain view"** - Creates a mountain landscape image
+- **"Generate art abstract painting"** - Creates abstract art
+- **"Create picture ocean waves"** - Generates an ocean scene
+- **"Make picture starry night"** - Creates a starry night sky image
+- **"Imagine forest path"** - Generates a forest path image
+- **"Generate img robot"** - Creates a robot image
+
+### Advanced Image Generation
+
+- **"Generate image of a cat eating pizza in space"** - Complex scene generation
+- **"Create picture medieval castle with dragons"** - Fantasy scene creation
+- **"Make image steampunk airship flying over clouds"** - Detailed sci-fi image
+- **"Draw image underwater city with mermaids"** - Fantasy underwater scene
+- **"Paint image cyberpunk street at night"** - Futuristic urban scene
+
+### Image Generation Features
+
+- **AI-powered**: Uses Google Gemini for high-quality image generation
+- **Automatic saving**: Images saved to `img/generate/` folder with timestamps
+- **Popup display**: Shows generated image in a popup window immediately
+- **High resolution**: Generates high-quality images
+- **Flexible prompts**: Supports simple and complex descriptions
+- **Smart parsing**: Automatically extracts image descriptions from commands
+
+### Image Generation Tips
+
+- **Be descriptive**: "beautiful sunset over mountains" works better than "sunset"
+- **Include details**: "red sports car on mountain road at sunset" is more specific
+- **Use styles**: "oil painting of a forest" or "watercolor landscape"
+- **Combine elements**: "cat wearing sunglasses on beach"
 
 ## 🗂️ Tab Management Commands
 
@@ -252,7 +291,14 @@ _[Facebook opens]_
 
 **You**: "Take screenshot"
 **Aarav**: "Screenshot captured and saved as 'screenshot*20250108_213045.png' (245.3 KB) in the screenshots folder!"
-*[Screenshot saved to screenshots folder]\_
+*[Screenshot saved to img/screenshots folder]\_
+
+### Image Generation
+
+**You**: "Generate image of a beautiful sunset"
+**Aarav**: "Image generated successfully! Saved as 'generated_20250108_213045.png'"
+*[Image popup appears on screen showing the generated sunset image]_
+*[Image also saved to img/generate/ folder]_
 
 ## 🔄 Integration with Aarav
 

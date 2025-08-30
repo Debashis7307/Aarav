@@ -1,0 +1,23 @@
+# Web Scraping and Document Analysis Dependencies
+# Add these to your main requirements.txt or install separately
+
+# Core web scraping
+beautifulsoup4==4.12.2
+requests==2.31.0
+httpx==0.25.0
+
+# Google Generative AI for document analysis
+google-generativeai==0.3.2
+
+# HTML parsing and web utilities
+lxml==4.9.3
+urllib3==2.0.7
+
+# Environment management (already in Communication/requirements.txt)
+python-dotenv==1.0.0
+
+# Optional: Enhanced HTML parsing
+html5lib==1.1
+
+# Installation command:
+# pip install beautifulsoup4 httpx google-generativeai lxml

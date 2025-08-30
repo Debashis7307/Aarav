@@ -8,20 +8,27 @@ import webbrowser
 import time
 import os
 import re
+import sys
 from urllib.parse import quote_plus
 import requests
 from bs4 import BeautifulSoup
 import pyautogui
 from datetime import datetime
+sys.path.append('..')
+sys.path.append('../..')
+from Automate.image_generation import ImageGenerator
 
 class WebAutomationIntegration:
     def __init__(self):
         """Initialize web automation integration."""
-        # Create screenshots directory if it doesn't exist
-        self.screenshots_dir = "screenshots"
+        # Create screenshots directory if it doesn't exist (in root img folder)
+        self.screenshots_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "img", "screenshots")
         if not os.path.exists(self.screenshots_dir):
             os.makedirs(self.screenshots_dir)
-        
+
+        # Initialize image generator
+        self.image_generator = ImageGenerator()
+
         # Common website URLs for quick access
         self.websites = {
             'google': 'https://www.google.com',
@@ -45,7 +52,7 @@ class WebAutomationIntegration:
             'github': 'https://github.com',
             'stackoverflow': 'https://stackoverflow.com'
         }
-        
+
         # Social media platforms
         self.social_media = {
             'facebook': 'https://www.facebook.com',
@@ -59,7 +66,7 @@ class WebAutomationIntegration:
             'telegram': 'https://web.telegram.org',
             'discord': 'https://discord.com/app'
         }
-        
+
         # Music and video platforms
         self.media_platforms = {
             'youtube': 'https://www.youtube.com',
@@ -72,6 +79,62 @@ class WebAutomationIntegration:
             'vimeo': 'https://vimeo.com',
             'dailymotion': 'https://www.dailymotion.com'
         }
+
+    def _close_all_tabs(self):
+        """Close all browser tabs using system shortcuts."""
+        try:
+            # First try to focus on the browser window
+            # Press Alt+Tab to cycle to browser (if needed)
+            pyautogui.hotkey('alt', 'tab')
+            time.sleep(0.5)
+
+            # Press Ctrl+Shift+W to close all tabs in most browsers (Chrome, Firefox, Edge)
+            pyautogui.hotkey('ctrl', 'shift', 'w')
+            time.sleep(1)
+
+            # Alternative method for some browsers: Ctrl+W repeatedly
+            # This ensures all tabs are closed even if Ctrl+Shift+W doesn't work
+            for _ in range(10):  # Close up to 10 tabs
+                pyautogui.hotkey('ctrl', 'w')
+                time.sleep(0.2)
+
+            return True, "Closed all browser tabs successfully!"
+        except Exception as e:
+            return False, f"Failed to close all tabs: {e}"
+
+    def _control_media_playback(self, action):
+        """Control media playback using system-wide media keys."""
+        try:
+            if action in ['play', 'pause', 'play_pause']:
+                pyautogui.press('playpause')
+                return True, f"{'Toggled' if action == 'play_pause' else action.title() + 'ed'} playback"
+
+            elif action == 'speed_up':
+                # Some media players use next/prev for speed control
+                pyautogui.press('nexttrack')
+                return True, "Increased playback speed"
+
+            elif action == 'speed_down':
+                pyautogui.press('prevtrack')
+                return True, "Decreased playback speed"
+
+            elif action == 'faster':
+                pyautogui.press('nexttrack')
+                return True, "Made playback faster"
+
+            elif action == 'slower':
+                pyautogui.press('prevtrack')
+                return True, "Made playback slower"
+
+            elif action == 'normal_speed':
+                # Reset with volume controls as fallback
+                pyautogui.press('volumedown')
+                time.sleep(0.1)
+                pyautogui.press('volumeup')
+                return True, "Reset to normal playback speed"
+
+        except Exception as e:
+            return False, f"Failed to control playback: {e}"
     
     def process_voice_command(self, command):
         """
@@ -88,11 +151,23 @@ class WebAutomationIntegration:
         # Tab management commands (check first)
         if self._is_tab_management_command(command_lower):
             return self._handle_tab_management_command(command_lower)
-        
+
+        # Close all tabs command
+        elif self._is_close_all_tabs_command(command_lower):
+            return self._close_all_tabs()
+
+        # Playback control commands
+        elif self._is_playback_control_command(command_lower):
+            return self._handle_playback_control_command(command_lower)
+
+        # Image generation commands (check before screenshot to avoid conflicts)
+        elif self._is_image_generation_command(command_lower):
+            return self._handle_image_generation_command(command_lower)
+
         # Screenshot commands
         elif self._is_screenshot_command(command_lower):
             return self._handle_screenshot_command(command_lower)
-        
+
         # Open website commands
         elif self._is_open_website_command(command_lower):
             return self._handle_open_website_command(command_lower)
@@ -138,7 +213,36 @@ class WebAutomationIntegration:
             'close window', 'close the window', 'close current window'
         ]
         return any(keyword in command for keyword in tab_keywords)
+
+    def _is_close_all_tabs_command(self, command):
+        """Check if command is to close all tabs."""
+        close_all_keywords = [
+            'close all tabs', 'close all the tabs', 'close all browser tabs',
+            'close all windows', 'close all browsers', 'close everything',
+            'shut all tabs', 'shut all windows', 'exit all tabs', 'exit all',
+            'close all my tabs', 'close browser tabs', 'close all tabs now',
+            'shut down all tabs', 'exit all windows', 'close all current tabs'
+        ]
+        return any(keyword in command for keyword in close_all_keywords)
+
+    def _is_playback_control_command(self, command):
+        """Check if command is for playback control."""
+        playback_keywords = [
+            'play', 'pause', 'stop', 'resume', 'speed up', 'speed down',
+            'faster', 'slower', 'normal speed', 'increase speed', 'decrease speed'
+        ]
+        return any(keyword in command for keyword in playback_keywords)
     
+    def _is_image_generation_command(self, command):
+        """Check if command is for generating images."""
+        image_gen_keywords = [
+            'generate image', 'create image', 'make image', 'generate picture',
+            'create picture', 'make picture', 'draw image', 'paint image',
+            'generate art', 'create art', 'make art', 'imagine', 'imaginary',
+            'generate img', 'create img', 'make img'
+        ]
+        return any(keyword in command for keyword in image_gen_keywords)
+
     def _is_screenshot_command(self, command):
         """Check if command is for taking screenshots."""
         screenshot_keywords = [
@@ -189,30 +293,82 @@ class WebAutomationIntegration:
             # Use Ctrl+W to close the current tab
             pyautogui.hotkey('ctrl', 'w')
             time.sleep(0.5)  # Small delay to ensure the action completes
-            
+
             return True, "Current tab closed successfully!"
-            
+
         except Exception as e:
             return False, f"Sorry, I couldn't close the tab. Error: {e}"
+
+    def _handle_playback_control_command(self, command):
+        """Handle playback control commands."""
+        command_lower = command.lower()
+
+        # Play/pause commands
+        if 'play' in command_lower or 'pause' in command_lower or 'resume' in command_lower:
+            return self._control_media_playback('play_pause')
+
+        # Speed control commands
+        elif 'speed up' in command_lower or 'faster' in command_lower or 'increase speed' in command_lower:
+            return self._control_media_playback('speed_up')
+
+        elif 'speed down' in command_lower or 'slower' in command_lower or 'decrease speed' in command_lower:
+            return self._control_media_playback('speed_down')
+
+        elif 'normal speed' in command_lower:
+            return self._control_media_playback('normal_speed')
+
+        return False, "I didn't understand that playback control command. Try saying 'play', 'pause', 'speed up', or 'speed down'"
     
+    def _handle_image_generation_command(self, command):
+        """Handle image generation commands."""
+        try:
+            # Extract prompt from command
+            prompt = self.image_generator.extract_prompt_from_command(command)
+
+            if not prompt:
+                return False, "I couldn't understand what image you want me to generate. Please provide a description like 'generate image of a sunset'."
+
+            print(f"🎨 Processing image generation request: '{prompt}'")
+
+            # Generate the image
+            success, message, image_path = self.image_generator.generate_image(
+                prompt=prompt,
+                save_image=True,
+                show_popup=True
+            )
+
+            if success:
+                filename = os.path.basename(image_path) if image_path else "generated image"
+                return True, f"Image generated successfully! {message}"
+            else:
+                return False, f"Sorry, I couldn't generate the image. {message}"
+
+        except Exception as e:
+            return False, f"Sorry, I couldn't generate the image. Error: {e}"
+
     def _handle_screenshot_command(self, command):
         """Handle screenshot commands."""
         try:
+            # Ensure screenshots directory exists
+            if not os.path.exists(self.screenshots_dir):
+                os.makedirs(self.screenshots_dir)
+                print(f"Created screenshots directory: {self.screenshots_dir}")
+
             # Generate filename with timestamp
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"screenshot_{timestamp}.png"
             filepath = os.path.join(self.screenshots_dir, filename)
-            
+
             # Take screenshot
             screenshot = pyautogui.screenshot()
             screenshot.save(filepath)
-            
+
             # Get file size for response
             file_size = os.path.getsize(filepath)
             file_size_kb = file_size / 1024
-            
+
             return True, f"Screenshot captured and saved as '{filename}' ({file_size_kb:.1f} KB) in the screenshots folder!"
-            
+
         except Exception as e:
             return False, f"Sorry, I couldn't take a screenshot. Error: {e}"
     
@@ -278,7 +434,7 @@ class WebAutomationIntegration:
                 try:
                     search_url = f"https://www.youtube.com/results?search_query={quote_plus(query)}"
                     webbrowser.open(search_url)
-                    return True, f"Searching YouTube for '{query}'"
+                    return True, f"Searching YouTube for '{query}' - click on a video to play"
                 except Exception as e:
                     return False, f"Sorry, I couldn't search YouTube. Error: {e}"
             else:
@@ -287,7 +443,7 @@ class WebAutomationIntegration:
                     return True, "Opening YouTube for you!"
                 except Exception as e:
                     return False, f"Sorry, I couldn't open YouTube. Error: {e}"
-        
+
         # Spotify music commands
         elif 'spotify' in command or 'music' in command:
             query = self._extract_search_query(command)
@@ -304,7 +460,7 @@ class WebAutomationIntegration:
                     return True, "Opening Spotify for you!"
                 except Exception as e:
                     return False, f"Sorry, I couldn't open Spotify. Error: {e}"
-        
+
         # Netflix commands
         elif 'netflix' in command:
             try:
@@ -312,19 +468,18 @@ class WebAutomationIntegration:
                 return True, "Opening Netflix for you!"
             except Exception as e:
                 return False, f"Sorry, I couldn't open Netflix. Error: {e}"
-        
-        # Generic play command
+
+        # Generic play command - default to YouTube
         elif 'play' in command:
             query = self._extract_search_query(command)
             if query:
                 try:
-                    # Try YouTube first for play commands
                     search_url = f"https://www.youtube.com/results?search_query={quote_plus(query)}"
                     webbrowser.open(search_url)
-                    return True, f"Searching for '{query}' on YouTube"
+                    return True, f"Searching for '{query}' on YouTube - click on a video to play"
                 except Exception as e:
                     return False, f"Sorry, I couldn't search for that. Error: {e}"
-        
+
         return False, "I didn't understand that media command. Try saying 'play music on YouTube' or 'open Spotify'"
     
     def _handle_social_media_command(self, command):
@@ -440,6 +595,20 @@ VOICE_COMMAND_PATTERNS = {
         r'play\s+(.+)?\s+on\s+youtube',
         r'play\s+(.+)?\s+on\s+spotify'
     ],
+    'playback_control': [
+        r'(play|pause|resume)\s+(?:the\s+)?(?:video|music|song)',
+        r'(play|pause|resume)',
+        r'speed\s+(up|down)',
+        r'(?:make\s+it\s+)?(faster|slower)',
+        r'(?:increase|decrease)\s+speed',
+        r'normal\s+speed'
+    ],
+    'close_all_tabs': [
+        r'close\s+all\s+(?:tabs|windows|browsers)',
+        r'shut\s+all\s+(?:tabs|windows)',
+        r'exit\s+all\s+(?:tabs|windows)',
+        r'close\s+everything'
+    ],
     'social_media': [
         r'open\s+(facebook|instagram|twitter|linkedin|reddit)',
         r'go\s+to\s+(facebook|instagram|twitter|linkedin|reddit)'
@@ -455,7 +624,14 @@ def test_web_automation():
         "take screenshot",
         "open Google",
         "search for Python programming",
+        "play Bohemian Rhapsody",
         "play music on YouTube",
+        "pause",
+        "play",
+        "speed up",
+        "speed down",
+        "normal speed",
+        "close all tabs",
         "open Facebook",
         "open Gmail",
         "search YouTube for tutorials",

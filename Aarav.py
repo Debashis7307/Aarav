@@ -15,6 +15,7 @@ from Communication.listen import SpeechToText
 from Communication.speak import speak_text
 from brain.gemini_brain import GeminiBrain
 from web_automation_integration import WebAutomationIntegration
+from voice_web_integration import get_integration, is_web_command as is_web_scraping_command
 import time
 import threading
 
@@ -24,6 +25,7 @@ class Aarav:
         self.listener = SpeechToText()
         self.brain = GeminiBrain()
         self.web_automation = WebAutomationIntegration()
+        self.web_integration = get_integration()  # Web scraping and document analysis
         self.is_running = False
         self.is_awake = False
         
@@ -79,7 +81,13 @@ class Aarav:
             "gmail", "email", "outlook", "yahoo",
             "weather", "maps", "youtube", "spotify", "netflix",
             "screenshot", "screen shot", "capture", "snap", "photo", "picture", "save screen",
-            "close", "remove", "delete", "cross", "shut", "exit", "tab", "browser", "window"
+            "generate image", "create image", "make image", "generate picture", "create picture",
+            "make picture", "draw image", "paint image", "generate art", "create art", "make art",
+            "imagine", "imaginary", "generate img", "create img", "make img",
+            "close", "remove", "delete", "cross", "shut", "exit", "tab", "browser", "window",
+            "pause", "resume", "speed up", "speed down", "faster", "slower", "normal speed",
+            "close all tabs", "close all windows", "close everything", "close all my tabs",
+            "shut all tabs", "exit all tabs", "close all current tabs", "close browser tabs"
         ]
         
         # Stop commands
@@ -121,6 +129,10 @@ class Aarav:
         """Check if the text contains a web automation command."""
         text_lower = text.lower().strip()
         return any(web_cmd in text_lower for web_cmd in self.web_commands)
+    
+    def is_web_scraping_command(self, text: str) -> bool:
+        """Check if the text contains a web scraping/search command."""
+        return is_web_scraping_command(text)
     
     def is_stop_command(self, text: str) -> bool:
         """Check if the text contains a stop command."""
@@ -214,6 +226,25 @@ class Aarav:
                             print("💤 Aarav is sleeping... ")
                         continue
                     
+                    # Check if it's a web scraping/search command
+                    if self.is_web_scraping_command(user_text):
+                        if self.is_awake:
+                            print("🔍 Aarav: Searching and analyzing...", end="", flush=True)
+                            result = self.web_integration.process_voice_command(user_text)
+                            print(" Done!")
+                            
+                            if result['success']:
+                                response = result['response']
+                                print(f"🤖 Aarav: {response}")
+                                speak_text(response)
+                            else:
+                                error_response = result['response']
+                                print(f"❌ Aarav: {error_response}")
+                                speak_text(error_response)
+                        else:
+                            print("💤 Aarav is sleeping... ")
+                        continue
+                    
                     # Check if it's a stop command
                     if self.is_stop_command(user_text):
                         if self.is_awake:
@@ -252,13 +283,16 @@ class Aarav:
 
 def main():
     """Main function to run Aarav AI."""
-    print("🧠 Aarav AI Assistant")
+    print("🤖 Aarav AI Assistant")
     print("=" * 40)
     print("Real-time Conversation Flow:")
     print("🎧 You: Speech to Text")
     print("🧠 Aarav: Thinking (Generating)")
     print("🤖 Aarav: Speaks Response")
     print("🌐 Web Automation: Open, Search, Play")
+    print("🔍 Web Analysis: Scrape, Summarize, Search")
+    print("📄 Document Analysis: PDF Analysis & Summary")
+    print("🌦️ Weather: Real-time Weather Information")
     print("=" * 40)
     
     # Start Aarav AI
